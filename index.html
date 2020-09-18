@@ -14,6 +14,10 @@
     </style>
   </head>
   <body>
+    <p id="connection-message"></p>
+    <label for="name">Enter you name</label>
+    <input id="name" />
+    <button onclick="displayMyName()">Submit</button>
     <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
@@ -21,8 +25,9 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script>
+        var socket = io();
+
         $(function () {
-            var socket = io();
             $('form').submit(function(e) {
                 e.preventDefault(); // prevents page reloading
                 socket.emit('chat message', $('#m').val());
@@ -32,7 +37,28 @@
             socket.on('chat message', function(msg){
                 $('#messages').append($('<li>').text(msg));
             });
+
+
+            socket.on('connected', function(msg){
+                document.getElementById('connection-message').innerHTML = msg;
+            } )
+            
+
+            socket.on('name received', function(msg){
+                document.getElementById('connection-message').innerHTML = msg;
+            });
+
+            socket.on('disconnected', function(msg){
+                document.getElementById('connection-message').innerHTML = msg;
+            })
         });
+
+        function displayMyName(){
+            //var socket = io();
+            console.log(document.getElementById('name').value);
+            socket.emit('send name', document.getElementById('name').value);
+        }
+
     </script>
   </body>
 </html>
